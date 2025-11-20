@@ -1,0 +1,10 @@
+__pycache__/
+.ipynb_checkpoints/
+
+*.pth
+*.pt
+
+dataset_root/
+
+best_unet.pth
+checkpoint.pth
