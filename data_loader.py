@@ -22,20 +22,28 @@ def apply_aug(img, mask):
         img  = TF.hflip(img)
         mask = TF.hflip(mask)
 
-    if random.random() < 0.5:
+    if random.random() < 0.3:
+        angle = random.uniform(-7, 7)
+        img   = TF.rotate(img, angle)
+        mask  = TF.rotate(mask, angle)
+
+    if random.random() < 0.3:
         h, w = img.shape[1], img.shape[2]
-        crop = max(1, int(0.9 * min(h, w)))
+        scale = random.uniform(0.9, 1.0)
+        crop = max(1, int(scale * min(h, w)))
+
         top  = random.randint(0, max(0, h - crop))
         left = random.randint(0, max(0, w - crop))
 
         img  = TF.crop(img, top, left, crop, crop)
         mask = TF.crop(mask, top, left, crop, crop)
 
-        img  = TF.resize(img,  (IMG_SIZE, IMG_SIZE))
+        img  = TF.resize(img, (IMG_SIZE, IMG_SIZE))
         mask = TF.resize(mask, (IMG_SIZE, IMG_SIZE))
 
-    if random.random() < 0.5:
-        img = TF.adjust_brightness(img, random.uniform(0.8, 1.2))
+    if random.random() < 0.3:
+        img = TF.adjust_brightness(img, random.uniform(0.9, 1.1))
+        img = TF.adjust_contrast(img,  random.uniform(0.9, 1.1))
 
     mask = (mask > 0.5).float()
     return img, mask
