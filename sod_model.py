@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class UNet(nn.Module):
-    def __init__(self, in_channels=3, base_channels=64):
+    def __init__(self, in_channels=3, base_channels=32):
         super().__init__()
 
         self.enc1 = self.double_conv(in_channels, base_channels, dropout_p=0.1)

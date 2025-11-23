@@ -35,7 +35,7 @@ def evaluate_model(root, weights_path="best_unet_improved.pth", batch_size=8):
 
     test_loader = make_loader(root, "test", batch=batch_size, aug=False)
 
-    model = UNet(in_channels=3, base_channels=64).to(DEVICE)
+    model = UNet(in_channels=3, base_channels=32).to(DEVICE)
     model.load_state_dict(torch.load(weights_path, map_location=DEVICE))
     model.eval()
 

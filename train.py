@@ -23,7 +23,7 @@ def combined_loss(pred, target):
     inter = (pred * target).sum((1, 2, 3))
     union = pred.sum((1, 2, 3)) + target.sum((1, 2, 3)) - inter
     soft_iou = ((inter + 1e-6) / (union + 1e-6)).mean()
-    return bce + 0.5 * (1 - soft_iou)
+    return 0.7 * bce + 0.3 * (1 - soft_iou)
 
 def save_checkpoint(epoch, model, opt, best, path=CKPT):
     torch.save({
@@ -75,7 +75,7 @@ def run_training(root, save_path="best_unet.pth",
     train_loader = make_loader(root, "train", batch=batch, aug=True)
     val_loader   = make_loader(root, "val",   batch=batch, aug=False)
 
-    model = UNet(3, 64).to(DEVICE)
+    model = UNet(3, 32).to(DEVICE)
     opt = optim.Adam(model.parameters(), lr=lr)
 
     best_val = float("inf")
