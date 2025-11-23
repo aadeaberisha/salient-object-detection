@@ -1,4 +1,3 @@
-%%writefile README.md
 # Salient Object Detection (SOD)
 
 A complete **end-to-end Salient Object Detection system** built with **PyTorch**.  
