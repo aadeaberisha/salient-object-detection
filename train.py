@@ -1,7 +1,9 @@
 import os
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
+
 from tqdm import tqdm
 
 from data_loader import make_loader
@@ -105,4 +107,11 @@ def run_training(root, save_path="best_unet.pth",
     return model
 
 if __name__ == "__main__":
-    run_training("dataset_root")
+    run_training(
+        root="dataset_root",
+        save_path="best_unet_improved.pth",
+        epochs=25,
+        batch=16,
+        lr=5e-4,
+        patience=5,
+    )

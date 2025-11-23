@@ -31,7 +31,7 @@ def compute_metrics(preds, targets, eps=1e-6):
     return iou.item(), precision.item(), recall.item(), f1.item(), mae.item()
 
 
-def evaluate_model(root, weights_path="best_unet.pth", batch_size=8):
+def evaluate_model(root, weights_path="best_unet_improved.pth", batch_size=8):
 
     test_loader = make_loader(root, "test", batch=batch_size, aug=False)
 
@@ -72,54 +72,38 @@ def evaluate_model(root, weights_path="best_unet.pth", batch_size=8):
 
     return model
 
-
 def visualize_samples(root, model, n_samples=4):
-
     model.eval()
-
+    
     vis_loader = make_loader(root, "test", batch=1, aug=False)
+    dataset = vis_loader.dataset
 
-    shown = 0
+    import random
+    indices = random.sample(range(len(dataset)), n_samples)
+
     with torch.no_grad():
-        for imgs, masks in vis_loader:
-            imgs  = imgs.to(DEVICE)
-            masks = masks.to(DEVICE)
-            preds = model(imgs)
+        for idx in indices:
+            img, mask = dataset[idx]
+            img = img.unsqueeze(0).to(DEVICE)
+            mask = mask.unsqueeze(0).to(DEVICE)
 
-            pred_bin = (preds > 0.5).float()
+            pred = model(img)
+            pred_bin = (pred > 0.5).float()
 
-            img_np   = imgs[0].permute(1, 2, 0).cpu().numpy()
-            gt_np    = masks[0, 0].cpu().numpy()
-            pred_np  = pred_bin[0, 0].cpu().numpy()
+            img_np = img[0].permute(1, 2, 0).cpu().numpy()
+            gt_np = mask[0, 0].cpu().numpy()
+            pred_np = pred_bin[0, 0].cpu().numpy()
 
             overlay = img_np.copy()
             overlay[..., 0] = np.clip(overlay[..., 0] + pred_np * 0.5, 0, 1)
 
             fig, axs = plt.subplots(1, 4, figsize=(10, 3))
-            axs[0].imshow(img_np)
-            axs[0].set_title("Input")
-            axs[0].axis("off")
-
-            axs[1].imshow(gt_np, cmap="gray")
-            axs[1].set_title("GT Mask")
-            axs[1].axis("off")
-
-            axs[2].imshow(pred_np, cmap="gray")
-            axs[2].set_title("Pred Mask")
-            axs[2].axis("off")
-
-            axs[3].imshow(overlay)
-            axs[3].set_title("Overlay")
-            axs[3].axis("off")
-
-            plt.tight_layout()
+            axs[0].imshow(img_np); axs[0].set_title("Input"); axs[0].axis("off")
+            axs[1].imshow(gt_np, cmap="gray"); axs[1].set_title("GT Mask"); axs[1].axis("off")
+            axs[2].imshow(pred_np, cmap="gray"); axs[2].set_title("Pred Mask"); axs[2].axis("off")
+            axs[3].imshow(overlay); axs[3].set_title("Overlay"); axs[3].axis("off")
             plt.show()
 
-            shown += 1
-            if shown >= n_samples:
-                break
-
-
 if __name__ == "__main__":
-    model = evaluate_model("dataset_root")
+    model = evaluate_model("dataset_root", weights_path="best_unet_improved.pth")
     visualize_samples("dataset_root", model)
